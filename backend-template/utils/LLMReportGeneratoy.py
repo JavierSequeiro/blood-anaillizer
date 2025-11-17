@@ -14,7 +14,9 @@ class LLMReportGenerator:
     def __init__(self, prompt, user_type, language="en", file_name="myFile"):
         self.prompt = prompt
         self.user_type = user_type.lower()
-        self.client = genai.Client(api_key="AIzaSyB6ls_XH2rRw8-afQXqrkNevv52THSpiyM")
+        gemini_api_key = os.environ.get("GEMINI-API-KEY")
+        # self.client = genai.Client(api_key="AIzaSyB6ls_XH2rRw8-afQXqrkNevv52THSpiyM")
+        self.client = genai.Client(api_key=gemini_api_key)
 
         self.languages_correspondances = {"en": "English",
                                           "es": "Spanish",
