@@ -435,7 +435,7 @@ class LLMReportGenerator:
 
         DEFAULT_FONT_NAME = 'DefaultUnicode'
         try:
-            pdf.add_font('ChineseFont', '', './utils/SimHei.ttf', uni=True)
+            pdf.add_font('ChineseFont', '', './utils/simhei.ttf', uni=True)
             CHINESE_FONT_LOADED = True
 
             
