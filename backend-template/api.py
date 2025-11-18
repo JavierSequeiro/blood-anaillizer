@@ -31,8 +31,8 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Blood Test Analysis API")
 
-origins = ["https://blood-anaillizer.netlify.app/",
-           "https://localhost:3000"]
+origins = ["https://blood-anaillizer.netlify.app",
+           "http://localhost:3000"]
         #    "*"] # "https://localhost:3000", local
 # CORS configuration
 app.add_middleware(
