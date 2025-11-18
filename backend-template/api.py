@@ -316,8 +316,8 @@ async def analyze_blood_test(
         except Exception as e:
             logger.warning(f"Error cleaning up temp files: {str(e)}")
 
-@app.post("/api/generate-pdf")
-# @app.post("/api/generate-pdf") #, response_model=GeneratedReport)
+# @app.post("/api/generate-pdf")
+@app.post("/api/generate-pdf", response_model=GeneratedReport)
 async def generate_pdf(
     request: PDFRequest,
 ):
@@ -383,13 +383,14 @@ async def generate_pdf(
         print(type(pdf_response_bytes))
         # return GeneratedReport(pdf_blob=pdf_response_str)
         print("Resp Before")
-        resp = Response(
-        content=pdf_response_bytes,
-        media_type="application/pdf",
-        headers={
-            # This header tells the browser to download the file
-            # with a specific name.
-            "Content-Disposition": "attachment; filename=generated_report.pdf"})
+        # resp = Response(
+        # content=pdf_response_bytes,
+        # media_type="application/pdf",
+        # headers={
+        #     # This header tells the browser to download the file
+        #     # with a specific name.
+        #     "Content-Disposition": "attachment; filename=generated_report.pdf"})
+        resp = GeneratedReport(pdf_blob=pdf_response_bytes)
         print("Resp After")
         return resp
         
