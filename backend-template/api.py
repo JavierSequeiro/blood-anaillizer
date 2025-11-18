@@ -315,7 +315,8 @@ async def analyze_blood_test(
         except Exception as e:
             logger.warning(f"Error cleaning up temp files: {str(e)}")
 
-@app.post("/api/generate-pdf") #, response_model=GeneratedReport)
+@app.options("/api/generate-pdf")
+# @app.post("/api/generate-pdf") #, response_model=GeneratedReport)
 async def generate_pdf(
     request: PDFRequest,
 ):
