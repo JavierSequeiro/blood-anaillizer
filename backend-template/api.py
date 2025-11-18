@@ -383,14 +383,14 @@ async def generate_pdf(
         print(type(pdf_response_bytes))
         # return GeneratedReport(pdf_blob=pdf_response_str)
         print("Resp Before")
-        # resp = Response(
-        # content=pdf_response_bytes,
-        # media_type="application/pdf",
-        # headers={
-        #     # This header tells the browser to download the file
-        #     # with a specific name.
-        #     "Content-Disposition": "attachment; filename=generated_report.pdf"})
-        resp = GeneratedReport(pdf_blob=pdf_response_bytes)
+        resp = Response(
+        content=pdf_response_bytes,
+        media_type="application/pdf",
+        headers={
+            # This header tells the browser to download the file
+            # with a specific name.
+            "Content-Disposition": "attachment; filename=generated_report.pdf"})
+        # resp = GeneratedReport(pdf_blob=pdf_response_bytes)
         print("Resp After")
         return resp
         
