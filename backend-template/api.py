@@ -343,6 +343,7 @@ async def generate_pdf(
     try:
         # print(request)
         report = request.report
+        logger.info(f"ACCESSED FUNCTION")
         print(f"REPORT")
         print(report)
         # Save uploaded file
@@ -377,6 +378,7 @@ async def generate_pdf(
         
         # logger.info(f"Successfully processed {file.filename} - {len(biomarkers)} biomarkers found")
         pdf_response_bytes = LLMReportGenerator(prompt="", user_type="patient", language="en").generate_pdf(response=report)
+        logger.info(f"GENERATED PDF")
         # print(pdf_response_str)
         print(type(pdf_response_bytes))
         # return GeneratedReport(pdf_blob=pdf_response_str)
