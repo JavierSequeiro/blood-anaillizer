@@ -31,7 +31,8 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Blood Test Analysis API")
 
-origins = ["https://blood-anaillizer.netlify.app/"]
+origins = ["https://blood-anaillizer.netlify.app/",
+           "https://localhost:3000"]
         #    "*"] # "https://localhost:3000", local
 # CORS configuration
 app.add_middleware(
@@ -315,7 +316,7 @@ async def analyze_blood_test(
         except Exception as e:
             logger.warning(f"Error cleaning up temp files: {str(e)}")
 
-@app.options("/api/generate-pdf")
+@app.post("/api/generate-pdf")
 # @app.post("/api/generate-pdf") #, response_model=GeneratedReport)
 async def generate_pdf(
     request: PDFRequest,
