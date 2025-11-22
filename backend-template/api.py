@@ -14,6 +14,8 @@ import tempfile
 import os
 import logging
 from pathlib import Path
+import subprocess
+import sys
 
 # Import your existing classes
 # Make sure these imports match your actual file structure
@@ -21,6 +23,21 @@ from utils.our_pdf_reader import PDFReaderNam
 from utils.df_analyzer import DFAnalyzer
 from utils.prompter import MedPrompter
 from utils.LLMReportGeneratoy import LLMReportGenerator
+
+# Install Requirements
+pip_path = [sys.executable, '-m', 'pip'] 
+try:
+    # Construct the full command: pip install -r requirements.txt
+    command = pip_path + ['install', '-r', 'requirements.txt']
+    # Run the command
+    # check_call waits for the command to complete and raises an exception on non-zero return code
+    subprocess.check_call(command)
+    print("✅ Successfully installed packages from requirements.txt")
+
+except subprocess.CalledProcessError as e:
+    print(f"❌ Error during package installation: {e}")
+except FileNotFoundError:
+    print("❌ Error: pip command was not found.")
 
 # Setup logging
 logging.basicConfig(
