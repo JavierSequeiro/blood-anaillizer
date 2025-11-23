@@ -283,7 +283,7 @@ async def analyze_blood_test(
             f.write(content)
         
         # Step 1: Process PDF to extract data
-        data_df, biomarkers = process_pdf_file(temp_pdf_path)
+        data_df, biomarkers = process_pdf_file(file_path=temp_pdf_path, language=language)
         print(biomarkers)
         
         if data_df is None or data_df.empty:
