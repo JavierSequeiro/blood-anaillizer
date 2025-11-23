@@ -2,7 +2,7 @@
 Blood Test Analysis API - Integrated with Existing Backend
 
 This FastAPI backend integrates your existing PDF processing pipeline with the frontend.
-It uses your custom classes: PDFReaderNam, DFAnalyzer, MedPrompter, and LLMReportGenerator.
+It uses your custom classes: PDFReader_, DFAnalyzer, MedPrompter, and LLMReportGenerator.
 """
 
 from fastapi import FastAPI, File, UploadFile, HTTPException, Response
@@ -19,7 +19,7 @@ import sys
 
 # Import your existing classes
 # Make sure these imports match your actual file structure
-from utils.our_pdf_reader import PDFReaderNam
+from utils.our_pdf_reader import PDFReader_
 from utils.df_analyzer import DFAnalyzer
 from utils.prompter import MedPrompter
 from utils.LLMReportGeneratoy import LLMReportGenerator
@@ -140,21 +140,21 @@ def dataframe_to_biomarkers(df: pd.DataFrame) -> List[Dict]:
     #         # Skip rows with missing or invalid data
     #         logger.warning(f"Skipping row due to error: {e}")
     #         continue
-    # data, biomarkers_dict, biomarkers_df = PDFReaderNam()
+    # data, biomarkers_dict, biomarkers_df = PDFReader_()
     return biomarkers
 
-def process_pdf_file(file_path: str) -> pd.DataFrame:
+def process_pdf_file(file_path: str, language:str) -> pd.DataFrame:
     """
-    Process PDF file using your PDFReaderNam class
+    Process PDF file using your PDFReader_ class
     
     Returns: DataFrame with blood test data
     """
     try:
         logger.info(f"Starting PDF Reading for {file_path}...")
         
-        # Use your PDFReaderNam class
-        pdf_reader = PDFReaderNam(pdf_path=file_path)
-        data, biomarkers, data_df = pdf_reader.analyze_pdf(to_df=True)
+        # Use your PDFReader_ class
+        pdf_reader = PDFReader_(pdf_path=file_path)
+        data, biomarkers, data_df = pdf_reader.analyze_pdf(language=language, to_df=True)
         
         logger.info("Finished PDF Reading!")
         
@@ -250,7 +250,7 @@ async def analyze_blood_test(
     
     Workflow:
     1. Receive PDF file
-    2. Extract data using PDFReaderNam
+    2. Extract data using PDFReader_
     3. Analyze data using DFAnalyzer
     4. Generate prompt using MedPrompter
     5. Generate report using LLMReportGenerator
@@ -343,7 +343,7 @@ async def generate_pdf(
     
     Workflow:
     1. Receive PDF file
-    2. Extract data using PDFReaderNam
+    2. Extract data using PDFReader_
     3. Analyze data using DFAnalyzer
     4. Generate prompt using MedPrompter
     5. Generate report using LLMReportGenerator
@@ -472,7 +472,7 @@ def supported_formats():
         "note": "Currently only PDF blood test reports are supported",
         "workflow": [
             "1. Upload PDF file",
-            "2. PDFReaderNam extracts data",
+            "2. PDFReader_ extracts data",
             "3. DFAnalyzer analyzes values",
             "4. MedPrompter creates prompt",
             "5. LLMReportGenerator creates report"

@@ -1,7 +1,7 @@
 import pdfplumber
 import re
 import pandas as pd
-from utils.our_pdf_reader import PDFReaderNam
+from utils.our_pdf_reader import PDFReader_
 import pypdf
 import fitz
 
@@ -12,7 +12,7 @@ class SyntheticTestGenerator:
 
 
     # def generate_synthetic_report(self, pdf_path):
-    #     pdfreader = PDFReaderNam(pdf_path=pdf_path)
+    #     pdfreader = PDFReader_(pdf_path=pdf_path)
 
         # pdf_ = pdfplumber.open(pdf_path)
         # pdf_ = pypdf.PdfReader(pdf_path)
