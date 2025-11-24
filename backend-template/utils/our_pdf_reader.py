@@ -123,6 +123,10 @@ class PDFReader_:
             # Case 1: normal ranges
             for match in re.finditer(pattern_range, line):
                 test, value, unit, ref_low, ref_high = match.groups()
+                value = value.replace(" ", "")
+                ref_low = ref_low.replace(" ", "")
+                ref_high = ref_high.replace(" ", "")
+                
                 data.append([
                     test.strip(),
                     float(value),
