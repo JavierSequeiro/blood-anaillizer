@@ -85,7 +85,7 @@ class PDFReader_:
             r"([A-Za-z0-9ÁÉÍÓÚÜáéíóúüñ\(\)/\-\s\*\.]+?)"  # test name
             r"\s+H?([\d.,]+(?:E\d+)?)"                   # value
             r"\s*([a-zA-Z0-9/%µ\.\*]*)?"                 # unit
-            r"\s+([\d.,]+)\s*(?:-|\s)\s*([\d.,]+)"       # ref low and high (with or without dash)
+            r"\s+([\d.,]+)\s*(?:-|à)\s*([\d.,]+)(?=\s|$)"       # ref low and high (with or without dash)
         )
 
         # Pattern for thresholds (< or > inside line, with or without brackets)
@@ -93,13 +93,22 @@ class PDFReader_:
             r"([A-Za-z0-9ÁÉÍÓÚÜáéíóúüñ\(\)/\-\s\*\.]+?)"
             r"\s*([<>])?\s*([\d.,]+(?:E\d+)?)"
             r"\s*([a-zA-Z0-9/%µ\.\,\^]*\s*m2|[a-zA-Z0-9/%µ\.\,\^]*)?"
-            r"\s*([<>])\s*([\d.,]+)"
+            r"\s*([<>])\s*(?:\s*à\s*)?([\d.,]+)"
         )
 
         data = []
         data_dict = []
         for line in text_per_lines:
             line = line.strip()
+            if "soit" in line:
+                # print(line)
+                segments = line.split("soit")
+                segments[0]  = segments[0].replace("soit ","")
+                segments[0] = re.sub(r'[0-9,%]','', segments[0])
+                line = segments[0] + segments[1]
+                # line = line.replace("soit ","")
+                # line = re.sub(r'[0-9%]','', line)
+                # print(f"After: {line}")
             if not line:
                 continue
             if line.startswith(("Page", "Página")):
