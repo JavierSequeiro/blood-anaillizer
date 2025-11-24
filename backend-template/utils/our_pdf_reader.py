@@ -83,7 +83,7 @@ class PDFReader_:
         # Pattern for normal ranges (low - high)
         pattern_range = (
             r"([A-Za-z0-9ÁÉÍÓÚÜáéíóúüñ\(\)/\-\s\*\.]+?)"  # test name
-            r"\s+H?([\d.,]+(?:E\d+)?)"                   # value
+            r"\s+H?([\d\s.,]+(?:E\d+)?)"                   # value
             r"\s*([a-zA-Z0-9/%µ\.\*]*)?"                 # unit
             r"\s+([\d.,]+)\s*(?:-|à)\s*([\d.,]+)(?=\s|$)"       # ref low and high (with or without dash)
         )
@@ -91,7 +91,7 @@ class PDFReader_:
         # Pattern for thresholds (< or > inside line, with or without brackets)
         pattern_threshold = (
             r"([A-Za-z0-9ÁÉÍÓÚÜáéíóúüñ\(\)/\-\s\*\.]+?)"
-            r"\s*([<>])?\s*([\d.,]+(?:E\d+)?)"
+            r"\s*([<>])?\s*([\d\s.,]+(?:E\d+)?)"
             r"\s*([a-zA-Z0-9/%µ\.\,\^]*\s*m2|[a-zA-Z0-9/%µ\.\,\^]*)?"
             r"\s*([<>])\s*(?:\s*à\s*)?([\d.,]+)"
         )
