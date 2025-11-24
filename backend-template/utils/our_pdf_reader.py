@@ -147,6 +147,7 @@ class PDFReader_:
             # Case 2: thresholds (< or >)
             for match in re.finditer(pattern_threshold, line):
                 test, sign_val, value, unit, sign_ref, limit = match.groups()
+                value = str(value).replace(" ", "") if value else None
                 value = float(value.replace(",", ".")) if value else None
                 limit = float(limit.replace(",", ".")) if limit else None
                 
