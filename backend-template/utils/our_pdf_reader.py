@@ -76,29 +76,41 @@ class PDFReader_:
         return biomarkers_list
 
 
-    
     def analyze_pdf(self, language, to_df=True):
         text_per_lines = self.read_pdf()
-
-        # Pattern for normal ranges (low - high)
+        
         pattern_range = (
-            r"([A-Za-z0-9ÁÉÍÓÚÜáéíóúüñ\(\)/\-\s\*\.]+?)"  # test name
-            r"\s+H?([\d\s.,]+(?:E\d+)?)"                   # value
-            r"\s*([a-zA-Z0-9/%µ\.\*]*)?"                 # unit
-            r"\s+([\d.,]+)\s*(?:-|à)\s*([\d.,]+)(?=\s|$)"       # ref low and high (with or without dash)
+            r"([A-Za-zÁÉÍÓÚÜáéíóúüñ][A-Za-z0-9ÁÉÍÓÚÜáéíóúüñ‡\(\)/\-\s\*\.]+?)"    # Group 1: test name
+            r"\s+H?([\d.,\s]+(?:\*E\d+)?)"       # Group 2: value (FIXED)
+            # r"\s+H?(\d+(?:[.,\s]\d+))*(?:\*E\d+)?"  
+            # r"\s+H?((?: \d+) (?:\d*|[.,\s]\d+)* (?:E\d+)?) "      # Group 2: value (FIXED)
+            # r"\s+H?((?:\d+[\d.,\s]+\d)+(?:E\d+)?) "
+            # r"\s*(?:[·])?([A-Za-z0-9/%µ\.\,\*\^¹²³⁴⁵⁶⁷⁸⁹]*)?"                  # Group 3: unit
+            # r"\s*(?=[A-Za-z/%µ])([·]?[A-Za-z0-9/%µ\.\,\*\^¹²³⁴⁵⁶⁷⁸⁹]*)?"
+            # r"\s*(?=[A-Za-z0-9/%µ\.\,\*\^¹²³⁴⁵⁶⁷⁸⁹]*[A-Za-z])([·]?[A-Za-z0-9/%µ\.\,\*\^¹²³⁴⁵⁶⁷⁸⁹]*)?" GOOD ONE
+            r"\s*(?:[·])?(\s*(?=[A-Za-z0-9/%µ\.\,\*\^¹²³⁴⁵⁶⁷⁸⁹]*[A-Za-z/%])[A-Za-z0-9/%µ\.\,\*\^¹²³⁴⁵⁶⁷⁸⁹]*)?"
+            # r"\s+([\d.,]+)\s*(?:-|à)\s*([\d.,]+)(?=\s|$)"    # Groups 4 & 5: ref low and high
+            r"\s*(?:[\(\[])?\s*([\d.,]+)\s*(?:-|à)\s*([\d.,]+)\s*(?:[\)\]])?(?=\s|$)"
         )
-
         # Pattern for thresholds (< or > inside line, with or without brackets)
         pattern_threshold = (
-            r"([A-Za-z0-9ÁÉÍÓÚÜáéíóúüñ\(\)/\-\s\*\.]+?)"
-            r"\s*([<>])?\s*([\d\s.,]+(?:E\d+)?)"
-            r"\s*([a-zA-Z0-9/%µ\.\,\^]*\s*m2|[a-zA-Z0-9/%µ\.\,\^]*)?"
-            r"\s*([<>])\s*(?:\s*à\s*)?([\d.,]+)"
+            r"([A-Za-zÁÉÍÓÚÜáéíóúüñ][A-Za-z0-9ÁÉÍÓÚÜáéíóúüñ‡\(\)/\-\s\*\.]+?)"
+            # r"\s*([<>])?\s*([\d\s.,]+(?:E\d+)?)"
+            # r"\s*([<>]?\d+[\d.,\s]*|\d*[\d.,\s]+\d+)(?:E\d+)?) "
+            # r"\s*(?:[<>])?\s* ( (\d+[\d.,\s]*|\d*[\d.,\s]+\d+) (?:E\d+)?) "
+            r"\s+H?([\d.,\s]+(?:\*E\d+)?)"
+            # r"\s*([<>]?[\d][\d\s.,])+(?:\*E\d+)?"
+            # r"\s*([·]?[a-zA-Z0-9/%µ\.\,\^]*\s*m2|[a-zA-Z0-9/%µ\.\,\^]*)?"
+            # r"\s*(?=[A-Za-z/%µ])([·]?[a-zA-Z0-9/%µ\.\,\^]*\s*m2|[a-zA-Z0-9/%µ\.\,\^]*)?"
+            r"\s*(?=[A-Za-z0-9/%µ\.\,\*\^¹²³⁴⁵⁶⁷⁸⁹]*[A-Za-z])([·]?[a-zA-Z0-9/%µ\.\,\^]*\s*m2|[a-zA-Z0-9/%µ\.\,\^¹²³⁴⁵⁶⁷⁸⁹]*)?"
+            # r"\s*([<>])\s*(?:\s*à\s*)?([\d.,]+)"
+            r"\s*(?:[\[\(])?\s*(Inf\.|inf\.|Sup\.|sup\.|[<>])\s*(?:\s*à\s*)?([\d.,]+)\s*(?:[\]\)])?(?=\s|$)"
         )
 
         data = []
         data_dict = []
         for line in text_per_lines:
+            # print(line)
             line = line.strip()
             if "soit" in line:
                 # print(line)
@@ -106,9 +118,7 @@ class PDFReader_:
                 segments[0]  = segments[0].replace("soit ","")
                 segments[0] = re.sub(r'[0-9,%]','', segments[0])
                 line = segments[0] + segments[1]
-                # line = line.replace("soit ","")
-                # line = re.sub(r'[0-9%]','', line)
-                # print(f"After: {line}")
+                
             if not line:
                 continue
             if line.startswith(("Page", "Página")):
@@ -118,14 +128,15 @@ class PDFReader_:
 
             # Replace commas with dots for decimals
             line = line.replace(",", ".")
-            line = line.replace("[", "").replace("]", "").replace(",", ".").replace("*", "").replace("(","").replace(")","")
-
+            line = line.replace("[", "").replace("]", "").replace(",", ".").replace("*", "")#.replace("(","").replace(")","").replace("  ", " ")
+            print(line)
             # Case 1: normal ranges
             for match in re.finditer(pattern_range, line):
+                print(match.groups())
                 test, value, unit, ref_low, ref_high = match.groups()
                 value = float(str(value).replace(" ", ""))
-                ref_low = float(str(ref_low).replace(" ", ""))
-                ref_high = float(str(ref_high).replace(" ", ""))
+                ref_low = round(float(str(ref_low).replace(" ", "")), 2)
+                ref_high = round(float(str(ref_high).replace(" ", "")), 2)
                 
                 data.append([
                     test.strip(),
@@ -146,8 +157,10 @@ class PDFReader_:
 
             # Case 2: thresholds (< or >)
             for match in re.finditer(pattern_threshold, line):
-                test, sign_val, value, unit, sign_ref, limit = match.groups()
-                value = str(value).replace(" ", "") if value else None
+                print(match.groups())
+                # test, sign_val, value, unit, sign_ref, limit = match.groups()
+                test, value, unit, sign_ref, limit = match.groups()
+                value = str(value).replace(" ", "").replace("<","").replace(">","") if value else None
                 value = float(value.replace(",", ".")) if value else None
                 limit = float(limit.replace(",", ".")) if limit else None
                 
@@ -173,12 +186,114 @@ class PDFReader_:
                     'unit': unit if unit else "",
                     'referenceRange': {'min': ref_low, 'max': ref_high},
                     'category': "Biomarkers"})
-                
-        # data_dict_standardized = self.standardize_biomarkers(biomarkers_list=data_dict, language=language)
         
         if to_df: 
             data_df = pd.DataFrame(data,columns=["Test", "Value", "Unit", "Ref Low", "Ref High" , "Category"])
             return data, data_dict, data_df
-            # return data, data_dict_standardized, data_df
         else:
             return data, data_dict
+    # def analyze_pdf(self, language, to_df=True):
+    #     text_per_lines = self.read_pdf()
+
+    #     # Pattern for normal ranges (low - high)
+    #     pattern_range = (
+    #         r"([A-Za-z0-9ÁÉÍÓÚÜáéíóúüñ\(\)/\-\s\*\.]+?)"  # test name
+    #         r"\s+H?([\d\s.,]+(?:E\d+)?)"                   # value
+    #         r"\s*([a-zA-Z0-9/%µ\.\*]*)?"                 # unit
+    #         r"\s+([\d.,]+)\s*(?:-|à)\s*([\d.,]+)(?=\s|$)"       # ref low and high (with or without dash)
+    #     )
+
+    #     # Pattern for thresholds (< or > inside line, with or without brackets)
+    #     pattern_threshold = (
+    #         r"([A-Za-z0-9ÁÉÍÓÚÜáéíóúüñ\(\)/\-\s\*\.]+?)"
+    #         r"\s*([<>])?\s*([\d\s.,]+(?:E\d+)?)"
+    #         r"\s*([a-zA-Z0-9/%µ\.\,\^]*\s*m2|[a-zA-Z0-9/%µ\.\,\^]*)?"
+    #         r"\s*([<>])\s*(?:\s*à\s*)?([\d.,]+)"
+    #     )
+
+    #     data = []
+    #     data_dict = []
+    #     for line in text_per_lines:
+    #         line = line.strip()
+    #         if "soit" in line:
+    #             # print(line)
+    #             segments = line.split("soit")
+    #             segments[0]  = segments[0].replace("soit ","")
+    #             segments[0] = re.sub(r'[0-9,%]','', segments[0])
+    #             line = segments[0] + segments[1]
+    #             # line = line.replace("soit ","")
+    #             # line = re.sub(r'[0-9%]','', line)
+    #             # print(f"After: {line}")
+    #         if not line:
+    #             continue
+    #         if line.startswith(("Page", "Página")):
+    #             continue
+    #         if not any(c.isdigit() for c in line):
+    #             continue
+
+    #         # Replace commas with dots for decimals
+    #         line = line.replace(",", ".")
+    #         line = line.replace("[", "").replace("]", "").replace(",", ".").replace("*", "").replace("(","").replace(")","")
+
+    #         # Case 1: normal ranges
+    #         for match in re.finditer(pattern_range, line):
+    #             test, value, unit, ref_low, ref_high = match.groups()
+    #             value = float(str(value).replace(" ", ""))
+    #             ref_low = float(str(ref_low).replace(" ", ""))
+    #             ref_high = float(str(ref_high).replace(" ", ""))
+                
+    #             data.append([
+    #                 test.strip(),
+    #                 float(value),
+    #                 unit if unit else "",
+    #                 float(ref_low),
+    #                 float(ref_high),
+    #                 "Biomarkers"
+    #             ])
+
+    #             data_dict.append({
+    #                 'id': test.strip(),
+    #                 'name': test.strip(),
+    #                 'value': float(value),
+    #                 'unit': unit if unit else "",
+    #                 'referenceRange': {'min':float(ref_low), 'max': float(ref_high)},
+    #                 'category': "Biomarkers"})
+
+    #         # Case 2: thresholds (< or >)
+    #         for match in re.finditer(pattern_threshold, line):
+    #             test, sign_val, value, unit, sign_ref, limit = match.groups()
+    #             value = str(value).replace(" ", "") if value else None
+    #             value = float(value.replace(",", ".")) if value else None
+    #             limit = float(limit.replace(",", ".")) if limit else None
+                
+    #             # adjust ref range
+    #             if sign_ref == "<":
+    #                 ref_low, ref_high = 0.0, limit
+    #             else:  # ">"
+    #                 ref_low, ref_high = limit, 10e12#float("inf")
+
+    #             data.append([
+    #                 test.strip(),
+    #                 value,
+    #                 unit if unit else "",
+    #                 ref_low,
+    #                 ref_high,
+    #                 "Biomarkers"
+    #             ])
+
+    #             data_dict.append({
+    #                 'id': test.strip(),
+    #                 'name': test.strip(),
+    #                 'value': value,
+    #                 'unit': unit if unit else "",
+    #                 'referenceRange': {'min': ref_low, 'max': ref_high},
+    #                 'category': "Biomarkers"})
+                
+    #     # data_dict_standardized = self.standardize_biomarkers(biomarkers_list=data_dict, language=language)
+        
+    #     if to_df: 
+    #         data_df = pd.DataFrame(data,columns=["Test", "Value", "Unit", "Ref Low", "Ref High" , "Category"])
+    #         return data, data_dict, data_df
+    #         # return data, data_dict_standardized, data_df
+    #     else:
+    #         return data, data_dict
